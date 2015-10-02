@@ -1,55 +1,10 @@
-require 'yaml'
+# Copyright (c) The Cocktail Experience S.L. (2015)
 require 'thor'
 require 'pathname'
 
+require_relative 'environment'
 
 module Tacoma
-
-  module Tool
-    class << self
-      attr_accessor :aws_identity_file
-      attr_accessor :aws_secret_access_key
-      attr_accessor :aws_access_key_id
-      attr_accessor :repo
-
-      def config
-        filename = File.join(Dir.home, ".tacoma.yml")
-        return YAML::load_file(filename)
-      end
-
-      def load_vars(environment)
-        config = Tool.config
-        if config.keys.include?(environment) == false
-          puts "Cannot find #{environment} key, check your YAML config file"
-          return false
-        end
-
-        if config[environment]
-          @aws_identity_file = config[environment]['aws_identity_file']
-          @aws_secret_access_key = config[environment]['aws_secret_access_key']
-          @aws_access_key_id = config[environment]['aws_access_key_id']
-          @repo = config[environment]['repo']
-        end
-      end
-      
-      # Assume there is a ~/.aws/credentials file with a valid format
-      def current_environment
-        current_filename = File.join(Dir.home, ".aws/credentials")
-        File.open(current_filename).each do |line|
-          if /aws_access_key_id/ =~ line
-            current_access_key_id = line[20..-2] # beware the CRLF
-            config = Tool.config
-            for key in config.keys
-              if config[key]['aws_access_key_id'] == current_access_key_id
-                return "#{key}"
-              end
-            end
-          end
-        end  
-        nil
-      end
-    end
-  end
 
   class Command < Thor
 
@@ -57,29 +12,23 @@ module Tacoma
 
     desc "list", "Lists all known AWS environments"
     def list
-      Tool.config.keys.each do |key|
+      Tacoma.yaml.keys.each do |key|
         puts key
       end
     end
-
-    TOOLS = {fog: '.fog', 
-             boto: '.boto', 
-             s3cfg: '.s3cfg', 
-             route53: '.route53', 
-             aws_credentials: '.aws/credentials'}
 
     desc "version", "Displays current tacoma version"
     def version
       puts "tacoma, version #{Tacoma::VERSION}"
       puts "Configuration templates available for:"
       TOOLS.each do |tool, config_path|
-        puts "   #{tool.to_s} => '~/#{config_path}'"
+        puts "   #{tool} => '~/#{config_path}'"
       end
     end
 
     desc "current", "Displays current loaded tacoma environment"
     def current
-      puts Tool.current_environment
+      puts Environment.current
       return true
     end
     
@@ -88,11 +37,11 @@ module Tacoma
     
     def switch(environment)
 
-      if Tool.load_vars(environment)
-        @aws_identity_file = Tool.aws_identity_file
-        @aws_secret_access_key = Tool.aws_secret_access_key
-        @aws_access_key_id = Tool.aws_access_key_id
-        @repo = Tool.repo
+      if env = Environment.new(environment)
+        @aws_identity_file = env.aws_identity_file
+        @aws_secret_access_key = env.aws_secret_access_key
+        @aws_access_key_id = env.aws_access_key_id
+        @repo = env.repo
 
         # set configurations for tools
         TOOLS.each do |tool, config_path|

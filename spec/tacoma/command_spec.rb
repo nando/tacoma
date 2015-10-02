@@ -50,7 +50,7 @@ describe Tacoma::Command do
     it 'creates the config files for the specified environment' do
       capture(:stdout) do
         subject.switch 'my_first_project'
-      end.must_match /(?:\s+create .+\n){#{Tacoma::Command::TOOLS.size}}/
+      end.must_match /(?:\s+create .+\n){#{Tacoma::TOOLS.size}}/
       # And we have in .aws/credentials my_first_project's key
       aws_credential_value('aws_access_key_id').must_equal 'YOURACCESSKEYID'
     end
@@ -59,7 +59,7 @@ describe Tacoma::Command do
       capture(:stdout) do
         subject.switch 'my_first_project'
         subject.switch 'my_second_project'
-      end.must_match /(?:\s+force .+\n){#{Tacoma::Command::TOOLS.size}}/
+      end.must_match /(?:\s+force .+\n){#{Tacoma::TOOLS.size}}/
       aws_credential_value('aws_access_key_id').must_equal 'ANOTHERACCESSKEYID'
     end
   end
