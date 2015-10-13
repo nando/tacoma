@@ -36,7 +36,6 @@ module Tacoma
     option :'with-exports', type: :boolean
     
     def switch(environment)
-
       if @env = Environment.new(environment)
         # set configurations for tools
         TOOLS.each do |tool, config_path|
@@ -61,7 +60,7 @@ module Tacoma
     desc "cd ENVIRONMENT", "Change directory to the project path"
     def cd(environment)
       if switch(environment)
-        Dir.chdir `echo #{@repo}`.strip
+        Dir.chdir `echo #{@env.repo}`.strip
         puts "Welcome to the tacoma shell"
         shell = ENV['SHELL'].split('/').last
         options =
