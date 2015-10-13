@@ -17,6 +17,8 @@ describe Tacoma::Environment do
     let(:project_name) { valid_yaml.keys.first }
     let(:project_conf) { valid_yaml[project_name] }
 
+    let(:project_REPO) { '/ENV/path/to/repo' }
+
     it 'should fail if the environment is not a key in the .tacoma.yml file' do
       Tacoma.stub(:yaml, empty_yaml) do
         lambda do
@@ -29,6 +31,15 @@ describe Tacoma::Environment do
       Tacoma.stub(:yaml, valid_yaml) do
         env = Tacoma::Environment.new(project_name)
         _(env.aws_identity_file).must_equal project_conf['aws_identity_file']
+      end
+    end 
+
+    it 'should use any configuration value available as environment variable' do
+      Tacoma.stub(:yaml, valid_yaml) do
+        ClimateControl.modify({ REPO: project_REPO }) do
+          env = Tacoma::Environment.new(project_name)
+          _(env.repo).must_equal project_REPO
+        end
       end
     end 
   end

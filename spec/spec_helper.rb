@@ -1,6 +1,7 @@
 $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 require 'tacoma'
 require 'minitest/autorun'
+require 'climate_control'
 
 module Tacoma
   SPECS_HOME = File.join(File.dirname(__FILE__), 'fixtures', 'home')

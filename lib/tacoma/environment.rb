@@ -12,19 +12,25 @@ module Tacoma
     end
 
     def aws_identity_file
-      @conf['aws_identity_file']
+      from_ENV_or_yaml 'aws_identity_file'
     end
 
     def aws_secret_access_key
-      @conf['aws_secret_access_key']
+      from_ENV_or_yaml 'aws_secret_access_key'
     end
 
     def aws_access_key_id
-      @conf['aws_access_key_id']
+      from_ENV_or_yaml 'aws_access_key_id'
     end
 
     def repo
-      @conf['repo']
+      from_ENV_or_yaml 'repo'
+    end
+
+    private
+
+    def from_ENV_or_yaml(key)
+      ENV[key.upcase] || @conf[key]
     end
 
     class << self
