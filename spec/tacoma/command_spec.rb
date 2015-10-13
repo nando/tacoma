@@ -63,4 +63,23 @@ describe Tacoma::Command do
       aws_credential_value('aws_access_key_id').must_equal 'ANOTHERACCESSKEYID'
     end
   end
+
+  describe 'templates' do
+    before do
+      FileUtils.rm_rf Tacoma::SPECS_TMP
+      ENV['HOME'] = Tacoma::SPECS_TMP
+      capture(:stdout) { subject.install }
+    end
+
+    let(:access_key) { 'TEMPLATES_SPEC_KEY_ID' }
+
+    it 'use environment variables when available' do
+      ClimateControl.modify({ AWS_ACCESS_KEY_ID: access_key }) do
+        capture(:stdout) do
+          subject.switch 'my_first_project'
+        end
+        aws_credential_value('aws_access_key_id').must_equal access_key
+      end
+    end
+  end
 end

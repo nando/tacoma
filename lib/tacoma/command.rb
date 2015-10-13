@@ -37,12 +37,7 @@ module Tacoma
     
     def switch(environment)
 
-      if env = Environment.new(environment)
-        @aws_identity_file = env.aws_identity_file
-        @aws_secret_access_key = env.aws_secret_access_key
-        @aws_access_key_id = env.aws_access_key_id
-        @repo = env.repo
-
+      if @env = Environment.new(environment)
         # set configurations for tools
         TOOLS.each do |tool, config_path|
           template_path = Pathname.new("#{self.class.source_root}/../template/#{tool}").realpath.to_s
@@ -50,12 +45,12 @@ module Tacoma
           template template_path, file_path, :force => true
         end
         
-        system("ssh-add #{@aws_identity_file}")
+        system("ssh-add #{@env.aws_identity_file}")
         if options[:'with-exports']
-          puts "export AWS_SECRET_ACCESS_KEY=#{@aws_secret_access_key}"
-          puts "export AWS_SECRET_KEY=#{@aws_secret_access_key}"
-          puts "export AWS_ACCESS_KEY=#{@aws_access_key_id}"
-          puts "export AWS_ACCESS_KEY_ID=#{@aws_access_key_id}"
+          puts "export AWS_SECRET_ACCESS_KEY=#{@env.aws_secret_access_key}"
+          puts "export AWS_SECRET_KEY=#{@env.aws_secret_access_key}"
+          puts "export AWS_ACCESS_KEY=#{@env.aws_access_key_id}"
+          puts "export AWS_ACCESS_KEY_ID=#{@env.aws_access_key_id}"
         end
         return true
       else
