@@ -19,7 +19,7 @@ describe Tacoma::Environment do
     end
   end
 
-  describe '#new(name)' do
+  describe '#new([name])' do
     let(:empty_yaml) { {} }
     let(:valid_yaml) {
       {
@@ -43,6 +43,12 @@ describe Tacoma::Environment do
         end.must_raise ArgumentError
       end
     end
+
+    it 'creates an instance with the values for current environment if no name received' do
+        env = Tacoma::Environment.new
+        _(env.name).must_equal current_project
+        _(env.aws_access_key_id).must_equal 'SecondProjectAccessKeyId'
+    end 
 
     it 'should create an instance with the values for the key called "name"' do
       Tacoma.stub(:yaml, valid_yaml) do

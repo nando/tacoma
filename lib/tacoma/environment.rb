@@ -1,9 +1,11 @@
 # Copyright (c) The Cocktail Experience S.L. (2015)
 module Tacoma
   class Environment
+    attr_reader :name
     attr_reader :conf
 
-    def initialize(name)
+    def initialize(name=nil)
+      name ||= self.class.current
       if (@conf = Tacoma.yaml[name])
         @name = name
       else
