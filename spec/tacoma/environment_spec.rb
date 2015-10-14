@@ -2,6 +2,23 @@
 require 'spec_helper'
 
 describe Tacoma::Environment do
+  before do
+    @real_home = ENV['HOME']
+    ENV['HOME'] = Tacoma::SPECS_HOME # ./spec/fixtures/home
+  end
+
+  after do
+    ENV['HOME'] = @real_home
+  end
+
+  let(:current_project) { 'second_project' }
+
+  describe '.current' do
+    it 'is the second_project (as defined by specs/fixtures/home)' do
+      _(Tacoma::Environment.current).must_equal current_project
+    end
+  end
+
   describe '#new(name)' do
     let(:empty_yaml) { {} }
     let(:valid_yaml) {
@@ -30,11 +47,12 @@ describe Tacoma::Environment do
     it 'should create an instance with the values for the key called "name"' do
       Tacoma.stub(:yaml, valid_yaml) do
         env = Tacoma::Environment.new(project_name)
+        _(env.name).must_equal project_name
         _(env.aws_identity_file).must_equal project_conf['aws_identity_file']
       end
     end 
 
-    it 'should use any configuration value available as environment variable' do
+    it 'should give priority to any conf. value available as environment variable' do
       Tacoma.stub(:yaml, valid_yaml) do
         ClimateControl.modify({ REPO: project_REPO }) do
           env = Tacoma::Environment.new(project_name)
