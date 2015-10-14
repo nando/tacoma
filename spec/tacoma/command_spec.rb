@@ -15,7 +15,7 @@ describe Tacoma::Command do
   end
 
   describe '#install' do
-    let(:output) { capture(:stdout) { subject.install } }
+    let(:output) { capture_io { subject.install }[0] }
 
     it 'should not overwrite ~/.tacoma.yml if we already have one' do
       output.must_include '~/.tacoma.yml already present'
@@ -30,7 +30,7 @@ describe Tacoma::Command do
   end
 
   describe '#list' do
-    let(:output) { capture(:stdout) { subject.list } }
+    let(:output) { capture_io { subject.list }[0] }
 
     it 'lists all AWS environments in the .tacoma.yml file' do
       output.must_equal <<-OUTPUT.gsub(/^ {8}/, '')
@@ -44,22 +44,23 @@ describe Tacoma::Command do
     before do
       FileUtils.rm_rf Tacoma::SPECS_TMP
       ENV['HOME'] = Tacoma::SPECS_TMP
-      capture(:stdout) { subject.install }
+      capture_io { subject.install }
     end
 
     it 'creates the config files for the specified environment' do
-      capture(:stdout) do
-        subject.switch 'my_first_project'
-      end.must_match /(?:\s+create .+\n){#{Tacoma::TOOLS.size}}/
+      output = capture_io { subject.switch 'my_first_project' }[0]
+
+      output.must_match /(?:\s+create .+\n){#{Tacoma::TOOLS.size}}/
       # And we have in .aws/credentials my_first_project's key
       aws_credential_value('aws_access_key_id').must_equal 'YOURACCESSKEYID'
     end
 
     it 'overwrites the config files for the specified environment' do
-      capture(:stdout) do
+      output = capture_io do
         subject.switch 'my_first_project'
         subject.switch 'my_second_project'
-      end.must_match /(?:\s+force .+\n){#{Tacoma::TOOLS.size}}/
+      end[0]
+      output.must_match /(?:\s+force .+\n){#{Tacoma::TOOLS.size}}/
       aws_credential_value('aws_access_key_id').must_equal 'ANOTHERACCESSKEYID'
     end
   end
@@ -68,16 +69,14 @@ describe Tacoma::Command do
     before do
       FileUtils.rm_rf Tacoma::SPECS_TMP
       ENV['HOME'] = Tacoma::SPECS_TMP
-      capture(:stdout) { subject.install }
+      capture_io { subject.install }
     end
 
     let(:access_key) { 'TEMPLATES_SPEC_KEY_ID' }
 
     it 'use environment variables when available' do
       ClimateControl.modify({ AWS_ACCESS_KEY_ID: access_key }) do
-        capture(:stdout) do
-          subject.switch 'my_first_project'
-        end
+        capture_io { subject.switch 'my_first_project' }
         aws_credential_value('aws_access_key_id').must_equal access_key
       end
     end
