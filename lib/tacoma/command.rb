@@ -86,6 +86,13 @@ module Tacoma
       end
     end
 
+    desc 'yaml', 'Show values in ~/.tacoma.yml for the current environment'
+    def yaml
+      Tacoma::Environment.new.conf.each do |key, value|
+        puts key + ":\t" + value
+      end
+    end
+
     def self.source_root
       File.dirname(__FILE__)
     end

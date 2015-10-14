@@ -65,6 +65,18 @@ describe Tacoma::Command do
     end
   end
 
+  describe '#yaml' do
+    before do
+      @real_home = ENV['HOME']
+      ENV['HOME'] = Tacoma::SPECS_HOME
+    end
+
+    it 'creates the config files for the specified environment' do
+      output = capture_io { subject.yaml }[0]
+      output.must_include "\tSecondProjectAccessKeyId\n"
+    end
+  end
+
   describe 'templates' do
     before do
       FileUtils.rm_rf Tacoma::SPECS_TMP
