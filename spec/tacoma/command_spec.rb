@@ -17,15 +17,26 @@ describe Tacoma::Command do
   describe '#install' do
     let(:output) { capture_io { subject.install }[0] }
 
+    before do
+      FileUtils.rm_rf Tacoma::SPECS_TMP
+      ENV['HOME'] = Tacoma::SPECS_TMP
+    end
+
     it 'should not overwrite ~/.tacoma.yml if we already have one' do
+      ENV['HOME'] = Tacoma::SPECS_HOME
       output.must_include '~/.tacoma.yml already present'
     end
 
     it 'should create ~/.tacoma.yml using the template' do
-      FileUtils.rm_rf Tacoma::SPECS_TMP
-      ENV['HOME'] = Tacoma::SPECS_TMP
       output.must_match /create .+\.tacoma\.yml/
       assert File.exist?("#{ENV['HOME']}/.tacoma.yml")
+    end
+
+    it 'should create a template for each tool at ~/.tacoma/templates/' do
+      Tacoma::TOOLS.each_value do |config_file|
+        output.must_match(/create .+#{config_file}/)
+        assert File.exist?("#{ENV['HOME']}/.tacoma/templates/#{config_file[1..-1]}"), config_file
+      end
     end
   end
 
@@ -91,6 +102,12 @@ describe Tacoma::Command do
         capture_io { subject.switch 'my_first_project' }
         aws_credential_value('aws_access_key_id').must_equal access_key
       end
+    end
+
+    it 'use ~/.tacoma/templates/ files' do
+      File.write(aws_home_credentials_file, access_key)
+      capture_io { subject.switch 'my_first_project' }
+      _(File.read(aws_credentials_file)).must_equal access_key
     end
   end
 end

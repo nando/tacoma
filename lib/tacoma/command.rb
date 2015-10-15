@@ -34,12 +34,11 @@ module Tacoma
     
     desc "switch ENVIRONMENT", "Prepares AWS config files for the providers. --with-exports will output environment variables"
     option :'with-exports', type: :boolean
-    
     def switch(environment)
       if @env = Environment.new(environment)
         # set configurations for tools
         TOOLS.each do |tool, config_path|
-          template_path = Pathname.new("#{Tacoma.source_root}/template/#{tool}").realpath.to_s
+          template_path = Pathname.new(Tacoma.home_template_file(tool)).realpath
           file_path = File.join(Dir.home, config_path)
           template template_path, file_path, :force => true
         end
@@ -80,9 +79,15 @@ module Tacoma
       if (File.exists?(File.join(Dir.home, ".tacoma.yml")))
         puts "File ~/.tacoma.yml already present, won't overwrite"
       else
-        template_path=Pathname.new("#{Tacoma.source_root}/template/tacoma.yml").realpath.to_s
+        template_path = Pathname.new(Tacoma.gem_template_file).realpath
         new_path = File.join(Dir.home, ".tacoma.yml")
         template template_path, new_path
+      end
+
+      Tacoma::TOOLS.each do |tool, config_file|
+        template_path = Pathname.new(Tacoma.gem_template_file(tool)).realpath
+        home_template = Tacoma.home_template_file(tool)
+        copy_file template_path, home_template
       end
     end
 
