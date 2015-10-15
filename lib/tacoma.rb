@@ -16,4 +16,8 @@ module Tacoma
   def yaml
     YAML::load_file(File.join(Dir.home, ".tacoma.yml"))
   end
+
+  def source_root
+    File.dirname(__FILE__)
+  end
 end

@@ -39,7 +39,7 @@ module Tacoma
       if @env = Environment.new(environment)
         # set configurations for tools
         TOOLS.each do |tool, config_path|
-          template_path = Pathname.new("#{self.class.source_root}/../template/#{tool}").realpath.to_s
+          template_path = Pathname.new("#{Tacoma.source_root}/template/#{tool}").realpath.to_s
           file_path = File.join(Dir.home, config_path)
           template template_path, file_path, :force => true
         end
@@ -80,7 +80,7 @@ module Tacoma
       if (File.exists?(File.join(Dir.home, ".tacoma.yml")))
         puts "File ~/.tacoma.yml already present, won't overwrite"
       else
-        template_path=Pathname.new("#{self.class.source_root}/../template/tacoma.yml").realpath.to_s
+        template_path=Pathname.new("#{Tacoma.source_root}/template/tacoma.yml").realpath.to_s
         new_path = File.join(Dir.home, ".tacoma.yml")
         template template_path, new_path
       end
@@ -94,7 +94,7 @@ module Tacoma
     end
 
     def self.source_root
-      File.dirname(__FILE__)
+      Tacoma.source_root
     end
 
   end
