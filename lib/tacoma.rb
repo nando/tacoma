@@ -21,6 +21,10 @@ module Tacoma
   end
 
   module_function
+  def installed?
+    File.exist?(File.join(Dir.home, '.tacoma.yml'))
+  end
+
   # NOTE: removes the first char (dot) for tool files
   def template_file(tool)
     tool ? Tool.files[tool][1..-1] : 'tacoma.yml'
