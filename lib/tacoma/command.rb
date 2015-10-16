@@ -99,7 +99,7 @@ module Tacoma
     end
 
     def self.source_root
-      Tacoma.source_root
+      File.dirname(__FILE__)
     end
 
   end
