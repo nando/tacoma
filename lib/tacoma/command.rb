@@ -21,7 +21,7 @@ module Tacoma
     def version
       puts "tacoma, version #{Tacoma::VERSION}"
       puts "Configuration templates available for:"
-      TOOLS.each do |tool, config_path|
+      Tool.files.each do |tool, config_path|
         puts "   #{tool} => '~/#{config_path}'"
       end
     end
@@ -37,7 +37,7 @@ module Tacoma
     def switch(environment)
       if @env = Environment.new(environment)
         # set configurations for tools
-        TOOLS.each do |tool, config_path|
+        Tool.files.each do |tool, config_path|
           template_path = Pathname.new(Tacoma.home_template_file(tool)).realpath
           file_path = File.join(Dir.home, config_path)
           template template_path, file_path, :force => true
@@ -84,7 +84,7 @@ module Tacoma
         template template_path, new_path
       end
 
-      Tacoma::TOOLS.each do |tool, config_file|
+      Tacoma::Tool.files.each do |tool, config_file|
         template_path = Pathname.new(Tacoma.gem_template_file(tool)).realpath
         home_template = Tacoma.home_template_file(tool)
         copy_file template_path, home_template

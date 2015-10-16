@@ -33,7 +33,7 @@ describe Tacoma::Command do
     end
 
     it 'should create a template for each tool at ~/.tacoma/templates/' do
-      Tacoma::TOOLS.each_value do |config_file|
+      Tacoma::Tool.files.each_value do |config_file|
         output.must_match(/create .+#{config_file}/)
         assert File.exist?("#{ENV['HOME']}/.tacoma/templates/#{config_file[1..-1]}"), config_file
       end
@@ -61,7 +61,7 @@ describe Tacoma::Command do
     it 'creates the config files for the specified environment' do
       output = capture_io { subject.switch 'my_first_project' }[0]
 
-      output.must_match /(?:\s+create .+\n){#{Tacoma::TOOLS.size}}/
+      output.must_match /(?:\s+create .+\n){#{Tacoma::Tool.files.size}}/
       # And we have in .aws/credentials my_first_project's key
       aws_credential_value('aws_access_key_id').must_equal 'YOURACCESSKEYID'
     end
@@ -71,7 +71,7 @@ describe Tacoma::Command do
         subject.switch 'my_first_project'
         subject.switch 'my_second_project'
       end[0]
-      output.must_match /(?:\s+force .+\n){#{Tacoma::TOOLS.size}}/
+      output.must_match /(?:\s+force .+\n){#{Tacoma::Tool.files.size}}/
       aws_credential_value('aws_access_key_id').must_equal 'ANOTHERACCESSKEYID'
     end
   end
