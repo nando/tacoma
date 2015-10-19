@@ -36,21 +36,14 @@ module Tacoma
     end
 
     class << self
-      # Assume there is a ~/.aws/credentials file with a valid format
+      # Assume the AWS credentials are defined in:
+      #  * the AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY env. variables, or
+      #  * in a ~/.aws/credentials file with a valid format.
       def current
-        current_filename = File.join(Dir.home, ".aws/credentials")
-        File.open(current_filename).each do |line|
-          if /aws_access_key_id/ =~ line
-            current_access_key_id = line[20..-2] # beware the CRLF
-            yaml = Tacoma.yaml
-            for key in yaml.keys
-              if yaml[key]['aws_access_key_id'] == current_access_key_id
-                return "#{key}"
-              end
-            end
-          end
-        end  
-        nil
+        current_access_key_id = ENV['AWS_ACCESS_KEY_ID'] || Tacoma.credentials_key_id
+        (yaml = Tacoma.yaml).keys.detect do |key|
+          yaml[key]['aws_access_key_id'] == current_access_key_id
+        end
       end
     end
   end

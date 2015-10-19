@@ -82,7 +82,10 @@ describe Tacoma::Command do
       ENV['HOME'] = Tacoma::SPECS_HOME
     end
 
-    it 'creates the config files for the specified environment' do
+    # Current env. defined by aws_access_key_id value in ~/.aws/credentials
+    # and ~/.tacoma.yml (in our specs/fixtures/home directory, no env. vars.
+    # defined here-that's tested in Tacoma::Environment specs).
+    it 'shows the current enviroment/section values in our .tacoma.yml' do
       output = capture_io { subject.yaml }[0]
       output.must_include "\tSecondProjectAccessKeyId\n"
     end

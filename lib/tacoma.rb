@@ -30,7 +30,17 @@ module Tacoma
   def home_templates_dir
     Dir.home + '/.tacoma/templates/'
   end
+
   def yaml
     YAML::load_file(File.join(Dir.home, ".tacoma.yml"))
+  end
+
+  # Assume there's a ~/.aws/credentials file with a valid format.
+  def credentials_key_id
+    current_filename = File.join(Dir.home, ".aws/credentials")
+    File.open(current_filename).each do |line|
+      return line[20..-2] if /aws_access_key_id/ =~ line
+    end
+    nil
   end
 end

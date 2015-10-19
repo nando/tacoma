@@ -11,12 +11,21 @@ describe Tacoma::Environment do
     ENV['HOME'] = @real_home
   end
 
+  let(:first_project) { 'first_project' }
+  let(:first_project_key) { 'FirstProjectAccessKeyId' }
   let(:current_project) { 'second_project' }
 
   describe '.current' do
-    it 'is the second_project (as defined by specs/fixtures/home)' do
+    it 'is defined by the aws_access_key_id value in ~/.aws/credentials' do
+      # and our fake home in spec/fixtures have that defined:
       _(Tacoma::Environment.current).must_equal current_project
     end
+
+    it 'gives priority to the AWS_ACCESS_KEY_ID env. variable' do
+      ClimateControl.modify({ AWS_ACCESS_KEY_ID: first_project_key }) do
+        _(Tacoma::Environment.current).must_equal first_project
+      end
+    end 
   end
 
   describe '#new([name])' do
