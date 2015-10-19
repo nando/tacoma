@@ -27,6 +27,12 @@ module Tacoma
     end
 
     desc "current", "Displays current loaded tacoma environment"
+    long_desc <<-LONG_DESC
+      Displays current loaded tacoma environment assuming the AWS credentials
+      are defined in one of the following:
+       * as AWS_ACCESS_KEY_ID & AWS_SECRET_ACCESS_KEY env. variables, otherwise 
+       * in the ~/.aws/credentials file with a valid format.
+    LONG_DESC
     def current
       puts Environment.current
       return true
@@ -91,7 +97,12 @@ module Tacoma
       end
     end
 
-    desc 'yaml', 'Show values in ~/.tacoma.yml for the current environment'
+    desc 'yaml', 'Shows values in ~/.tacoma.yml for the current environment'
+    long_desc <<-LONG_DESC
+      Show the ~/.tacoma.yml values of the environment which aws_access_key_id
+      is specified by the AWS_ACCESS_KEY_ID env. variable or, if not defined,
+      the value of the aws_access_key_id key in our ~/.aws/credentials file.
+    LONG_DESC
     def yaml
       Tacoma::Environment.new.conf.each do |key, value|
         puts key + ":\t" + value
