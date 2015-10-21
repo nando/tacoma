@@ -13,16 +13,8 @@ module Tacoma
       semver_string[/^\d+\.\d+/]
     end
 
-    def capture(stream)
-      begin
-        stream = stream.to_s
-        eval "$#{stream} = StringIO.new"
-        yield
-        result = eval("$#{stream}").string
-      ensure
-        eval("$#{stream} = #{stream.upcase}")
-      end
-      result
+    def aws_home_credentials_file
+      File.join(ENV['HOME'], '.tacoma', 'templates', 'aws', 'credentials')
     end
 
     def aws_credentials_file
